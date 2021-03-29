@@ -22,7 +22,7 @@ To be able to stream audio from spotify, you will need [librespot](https://githu
 ```ini
 [spotify]
 username = longAlphaNumericStringPossibly
-password = NoNeedFor"ifYourPasswordDoesn'tHaveThemInside
+password = doesntNeedToBeQuotedIfYouDontHaveQuotesInPwd
 ```
 
 ## Commands
