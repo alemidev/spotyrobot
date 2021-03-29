@@ -74,10 +74,10 @@ async def join_call_start_radio(client, message):
 		await group_call.start(message.chat.id)
 		group_call.input_filename = "data/music-fifo"
 		group_call.restart_playout()
-		await edit_or_reply(message, "` â†’ ` Connected")
+		await edit_or_reply(message, "` → ` Connected")
 	except Exception as e:
 		logger.exception("Error in .leave command")
-		await edit_or_reply(message, "`[!] â†’ ` " + str(e))
+		await edit_or_reply(message, "`[!] → ` " + str(e))
 
 HELP.add_help("leave", "stop radio and leave call", "stop radio and leave call")
 @alemiBot.on_message(is_superuser & filterCommand("leave", list(alemiBot.prefixes)))
@@ -93,29 +93,17 @@ async def stop_radio(client, message):
 		decoder_instance.wait()
 		os.remove("data/music-fifo")
 		os.remove("data/raw-fifo")
-		await edit_or_reply(message, "` â†’ ` Disconnected")
+		await edit_or_reply(message, "` → ` Disconnected")
 	except Exception as e:
 		logger.exception("Error in .leave command")
-		await edit_or_reply(message, "`[!] â†’ ` " + str(e))
+		await edit_or_reply(message, "`[!] → ` " + str(e))
 	await client.set_offline()
 
 HELP.add_help("volume", "join call and start radio", "join call and start radio")
-@alemiBot.on_message(is_allowed & filterCommand("volume", list(alemiBot.prefixes)))
+@alemiBot.on_message(is_superuser & filterCommand("volume", list(alemiBot.prefixes)))
 async def volume(client, message):
 	if "cmd" not in message.command:
-		return await edit_or_reply(message, "`[!] â†’ ` No value given")
+		return await edit_or_reply(message, "`[!] → ` No value given")
 	val = int(message.command["cmd"][1])
 	await group_call.set_my_volume(val)
-	await edit_or_reply(message, f"` â†’ ` Volume set to {val}")
-
-HELP.add_help("mute", "join call and start radio", "join call and start radio")
-@alemiBot.on_message(is_allowed & filterCommand("mute", list(alemiBot.prefixes)))
-async def mute_call(client, message):
-	global muted
-	group_call.client = client
-	muted = not muted
-	group_call.set_is_mute(muted)
-	if muted:
-		await edit_or_reply(message, f"` â†’ ` Muted")
-	else:
-		await edit_or_reply(message, f"` â†’ ` Unmuted")
+	await edit_or_reply(message, f"` → ` Volume set to {val}")
