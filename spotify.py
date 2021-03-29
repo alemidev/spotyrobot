@@ -1,26 +1,19 @@
 import asyncio
-import secrets
-import random
 import os
-import io
-import re
 
 from signal import SIGINT
 
-import ffmpeg	# pip install ffmpeg-python
-
-from PIL import Image, ImageEnhance, ImageOps
+import ffmpeg
 
 from pyrogram import filters
-from pyrogram.types import InputMediaPhoto, InputMediaVideo, Message
+from pyrogram.types import Message
 
-from pytgcalls import GroupCall		# pip install pytgcalls
+from pytgcalls import GroupCall
 
 from bot import alemiBot
 
-from util import batchify
 from util.permission import is_allowed, is_superuser
-from util.message import edit_or_reply, get_text, is_me
+from util.message import edit_or_reply
 from util.command import filterCommand
 
 from plugins.help import HelpCategory
@@ -126,28 +119,3 @@ async def mute_call(client, message):
 		await edit_or_reply(message, f"` â†’ ` Muted")
 	else:
 		await edit_or_reply(message, f"` â†’ ` Unmuted")
-
-# @alemiBot.on_message(main_filter & cmd_filter('rejoin'))
-# @init_client_and_delete_message
-# async def reconnect(*_):
-#	  await group_call.reconnect()
-
-# @alemiBot.on_message(main_filter & cmd_filter('replay'))
-# @init_client_and_delete_message
-# async def restart_playout(*_):
-#	  group_call.restart_playout()
-
-# @alemiBot.on_message(main_filter & cmd_filter('stop'))
-# @init_client_and_delete_message
-# async def stop_playout(*_):
-#	  group_call.stop_playout()
-
-# @alemiBot.on_message(main_filter & cmd_filter('pause'))
-# @init_client_and_delete_message
-# async def pause(*_):
-#	  group_call.pause_playout()
-
-# @alemiBot.on_message(main_filter & cmd_filter('resume'))
-# @init_client_and_delete_message
-# async def resume(*_):
-#	  group_call.resume_playout()
