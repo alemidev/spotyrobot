@@ -1,7 +1,3 @@
-# spoty-robot
-An alemibot plugin to play music off spotify and control queue
-
-
 # spotify plugin
 This is a plugin for my userbot ([alemibot](https://github.com/alemigliardi/alemibot)) to stream spotify music into Group Calls. This is mostly intended for a third party userbot, used as "music player". You can run this on your own account but you will not be able to play music in a Voice Chat and, at the same time, listen to it or even speak. You should configure another userbot (cannot be a bot account), with `alemibot` and include only this plugin (I recommend including `core` too).
 
