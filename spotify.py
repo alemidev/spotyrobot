@@ -27,10 +27,14 @@ decoder_instance = None
 spotify_instance = None
 muted = False
 
-async def prep_radio(device_name="SpotyRobot"):
+spoty_logfile = None
+
+async def prep_radio(device_name="SpotyRobot", quiet=True):
+	# TODO make a state instance and not this many global!!
 	global spotify_instance
 	global decoder_instance
 	global group_call
+	global spoty_logfile
 	username = alemiBot.config.get("spotify", "username", fallback=None)
 	password = alemiBot.config.get("spotify", "password", fallback=None)
 	try:
@@ -38,8 +42,11 @@ async def prep_radio(device_name="SpotyRobot"):
 		os.mkfifo("data/music-fifo")
 	except FileExistsError:
 		pass
+	if quiet:
+		spoty_logfile = open("data/spotify.log")
 	spotify_instance = await asyncio.create_subprocess_exec(
-		f"./data/librespot", "--name", device_name, "--backend", "pipe", "--device", "./data/raw-fifo", "-u", username, "-p", password, "--passthrough"
+		f"./data/librespot", "--name", device_name, "--backend", "pipe", "--device", "./data/raw-fifo", "-u", username, "-p", password, "--passthrough",
+		stderr=asyncio.subprocess.STDOUT, stdout=spoty_logfile # if it's none it inherits stdout from parent
 	)
 	decoder_instance = ffmpeg.input("data/raw-fifo").output(
 		"data/music-fifo",
@@ -47,7 +54,7 @@ async def prep_radio(device_name="SpotyRobot"):
 		acodec='pcm_s16le',
 		ac=2,
 		ar='48k'
-	).overwrite_output().run_async()
+	).overwrite_output().run_async(quiet=quiet)
 
 @alemiBot.on_message(is_superuser & filters.voice_chat_members_invited)
 async def invited_to_voice_chat(client, message):
@@ -85,6 +92,7 @@ async def stop_radio(client, message):
 	global spotify_instance
 	global decoder_instance
 	global group_call
+	global spoty_logfile
 	try:
 		await group_call.stop()
 		spotify_instance.kill() # I would love to stop this more gracefully but sometimes it just hangs!
@@ -94,6 +102,9 @@ async def stop_radio(client, message):
 		os.remove("data/music-fifo")
 		os.remove("data/raw-fifo")
 		await edit_or_reply(message, "` → ` Disconnected")
+		if spoty_logfile is not None:
+			spoty_logfile.close()
+			spoty_logfile = None
 	except Exception as e:
 		logger.exception("Error in .leave command")
 		await edit_or_reply(message, "`[!] → ` " + str(e))
