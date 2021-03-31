@@ -43,7 +43,7 @@ async def prep_radio(device_name="SpotyRobot", quiet=True):
 	except FileExistsError:
 		pass
 	if quiet:
-		spoty_logfile = open("data/spotify.log")
+		spoty_logfile = open("data/spotify.log", "w")
 	spotify_instance = await asyncio.create_subprocess_exec(
 		f"./data/librespot", "--name", device_name, "--backend", "pipe", "--device", "./data/raw-fifo", "-u", username, "-p", password, "--passthrough",
 		stderr=asyncio.subprocess.STDOUT, stdout=spoty_logfile # if it's none it inherits stdout from parent
