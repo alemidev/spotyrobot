@@ -26,7 +26,7 @@ class Session:
 		if quiet:
 			self.logfile = open("data/spotify.log", "w")
 		self.spotify_process = subprocess.Popen(
-			["./data/librespot", "--name", device_name, "--backend", "pipe",
+			["./data/librespot", "--name", device_name, "--device-type", device_type, "--backend", "pipe",
 			 "--device", "./data/raw-fifo", "-u", username, "-p", password, "--passthrough"],
 			stderr=subprocess.STDOUT, stdout=self.logfile # if it's none it inherits stdout from parent
 		)
