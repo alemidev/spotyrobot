@@ -42,12 +42,12 @@ class Session:
 		try:
 			self.spotify_process.send_signal(SIGINT)
 			self.spotify_process.wait(timeout=5)
-		except TimeoutError:
+		except subprocess.TimeoutExpired:
 			self.spotify_process.kill()
 		try:
 			self.ffmpeg_process.send_signal(SIGINT)
 			self.ffmpeg_process.wait(timeout=5)
-		except TimeoutError:
+		except subprocess.TimeoutExpired:
 			self.ffmpeg_process.kill()
 		os.remove("data/music-fifo")
 		os.remove("data/raw-fifo")
