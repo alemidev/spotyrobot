@@ -5,7 +5,7 @@ This is a plugin for my userbot ([alemibot](https://github.com/alemigliardi/alem
 
 You should first set up [alemibot](https://github.com/alemigliardi/alemibot). Once that is done, just run
 
-	git submodule add -b dev git@github.com:alemigliardi/spoty-robot.git plugins/spotyrobot
+	git submodule add -b dev git@github.com:alemigliardi/spotyrobot.git plugins/spotyrobot
 	
 in bot's root folder.
 
