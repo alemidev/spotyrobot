@@ -27,7 +27,7 @@ HELP = HelpCategory("SPOTIFY")
 
 @alemiBot.on_message(is_superuser & filters.voice_chat_members_invited)
 async def invited_to_voice_chat(client, message):
-	if sess.group_call.is_connected:
+	if sess.group_call and sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
 	try:
 		sess.start()
@@ -47,7 +47,7 @@ HELP.add_help("join", "join call and start radio",
 	"type" : ["-t", "--type"],
 }))
 async def join_call_start_radio(client, message):
-	if sess.group_call.is_connected:
+	if sess.group_call and sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
 	try:
 		devicename = message.command["name"] if "name" in message.command else "SpotyRobot"
