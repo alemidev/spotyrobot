@@ -29,10 +29,8 @@ HELP = HelpCategory("SPOTIFY")
 async def invited_to_voice_chat(client, message):
 	try:
 		sess.start()
-		sess.group_call = GroupCall(client, path_to_log_file='')
+		sess.group_call = GroupCall(client, "data/music-fifo")
 		await sess.group_call.start(message.chat.id)
-		sess.group_call.input_filename = "data/music-fifo"
-		sess.group_call.restart_playout()
 	except:
 		logger.exception("Error while joining voice chat")
 
@@ -51,10 +49,8 @@ async def join_call_start_radio(client, message):
 		devicename = message.command["name"] if "name" in message.command else "SpotyRobot"
 		devicetype = message.command["type"] if "type" in message.command else "speaker"
 		sess.start(device_name=devicename, device_type=devicetype)
-		sess.group_call = GroupCall(client, path_to_log_file='')
+		sess.group_call = GroupCall(client, "data/music-fifo")
 		await sess.group_call.start(message.chat.id)
-		sess.group_call.input_filename = "data/music-fifo"
-		sess.group_call.restart_playout()
 		await edit_or_reply(message, "` → ` Connected")
 	except Exception as e:
 		logger.exception("Error in .leave command")
