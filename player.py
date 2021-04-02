@@ -31,11 +31,7 @@ async def invited_to_voice_chat(client, message):
 		sess.start()
 		sess.group_call = GroupCall(client, path_to_log_file='')
 		await sess.group_call.start(message.chat.id)
-		sess.group_call.input_filename = "data/joined.raw"
-		@sess.group_call.on_playout_ended
-		async def switch_to_music():
-			sess.group_call.input_filename = "data/music-fifo"
-			sess.group_call.restart_playout()
+		sess.group_call.input_filename = "data/music-fifo"
 		sess.group_call.restart_playout()
 	except:
 		logger.exception("Error while joining voice chat")
