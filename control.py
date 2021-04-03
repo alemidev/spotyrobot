@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 
 HELP = HelpCategory("SPOTIFY")
 
-auth = SpotifyOAuth(username=alemiBot.config.get("spotify", "username", None),
+auth = SpotifyOAuth(username=alemiBot.config.get("spotify", "username", fallback=None),
                     scope="user-modify-playback-state user-read-currently-playing",
-                    client_id=alemiBot.config.get("spotify", "clientId", None),
-                    client_secret=alemiBot.config.get("spotify", "clientSecret", None),
+                    client_id=alemiBot.config.get("spotify", "clientId", fallback=None),
+                    client_secret=alemiBot.config.get("spotify", "clientSecret", fallback=None),
                     redirect_uri='https://alemi.dev/spotify',
                     open_browser=False)
 spotify = Spotify(auth_manager=auth)
