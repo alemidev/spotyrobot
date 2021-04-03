@@ -52,7 +52,7 @@ async def join_call_start_radio(client, message):
 	try:
 		devicename = message.command["name"] if "name" in message.command else "SpotyRobot"
 		devicetype = message.command["type"] if "type" in message.command else "speaker"
-		quiet = "-debug" in message.command["flags"]
+		quiet = "-debug" not in message.command["flags"]
 		sess.start(device_name=devicename, device_type=devicetype, quiet=quiet)
 		sess.group_call = GroupCall(client, "data/music-fifo")
 		await sess.group_call.start(message.chat.id)
