@@ -41,18 +41,19 @@ HELP.add_help("join", "join call and start radio",
 				"a spotify device, you should select it and play music on it. It will " +
 				"be played by the bot. You can specify the device name with `-n` and the " +
 				"device type with `-t`. Available types are : `[ computer, tablet, " +
-				"smartphone, speaker, tv, avr, stb, audiodongle ]`.", args="[-n <name>] [-t <type>]")
+				"smartphone, speaker, tv, avr, stb, audiodongle ]`.", args="[-n <name>] [-t <type>] [-debug]")
 @alemiBot.on_message(is_superuser & filterCommand("join", list(alemiBot.prefixes), options={
 	"name" : ["-n", "--name"],
 	"type" : ["-t", "--type"],
-}))
+}, flags=["-debug"]))
 async def join_call_start_radio(client, message):
 	if sess.group_call and sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
 	try:
 		devicename = message.command["name"] if "name" in message.command else "SpotyRobot"
 		devicetype = message.command["type"] if "type" in message.command else "speaker"
-		sess.start(device_name=devicename, device_type=devicetype)
+		quiet = "-debug" in message.command["flags"]
+		sess.start(device_name=devicename, device_type=devicetype, quiet=quiet)
 		sess.group_call = GroupCall(client, "data/music-fifo")
 		await sess.group_call.start(message.chat.id)
 		await edit_or_reply(message, "` → ` Connected")
