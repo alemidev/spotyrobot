@@ -25,6 +25,7 @@ auth = SpotifyOAuth(username=alemiBot.config.get("spotify", "username", fallback
                     redirect_uri='https://alemi.dev/spotify',
                     open_browser=False)
 spotify = Spotify(auth_manager=auth)
+logger.debug(str(spotify.current_user()))
 
 
 HELP.add_help("queue", "add song to queue",
