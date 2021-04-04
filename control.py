@@ -47,7 +47,7 @@ async def add_to_queue(client, message):
 			res = spotify.search(q, limit=1)
 			uri = res["tracks"]["items"][0]["uri"]
 			text = join_artists(res["tracks"]["items"][0]["artists"]) + " - " + \
-					f"[{res['tracks']['items'][0]['name']}]({res['tracks']['items'][0]['href']})"
+					f"[{res['tracks']['items'][0]['name']}]({res['tracks']['items'][0]['external_urls']['spotify']})"
 			spotify.add_to_queue(uri)
 			await edit_or_reply(message, f"` → ` Added `{text}`")
 	except Exception as e:
@@ -60,7 +60,7 @@ HELP.add_help("playing", "show current track", "print `<artist> - <title> [<albu
 async def show_current_song(client, message):
 	try:
 		res = spotify.current_user_playing_track()
-		text = f"**{join_artists(res['item']['artists'])}** - [{res['item']['name']}]({res['item']['href']}) (_{res['item']['album']['name']}_) " + \
+		text = f"**{join_artists(res['item']['artists'])}** - [{res['item']['name']}]({res['item']['external_urls']['spotify']}) (_{res['item']['album']['name']}_) " + \
 				f"[{res['progress_ms']/1000:.0f}/{res['item']['duration_ms']/1000:.0f}]"
 		await edit_or_reply(message, f"` → ` {text}")
 	except Exception as e:
