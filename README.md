@@ -30,7 +30,7 @@ password = doesntNeedToBeQuotedIfYouDontHaveQuotesInPwd
 ### Controlling spotify
 To be able to control spotify playback, you need to make an application in your spotify dashboard. Find your `clientId` and `clientSecret` and add them to your config file under the `[spotify]` category:
 ```ini
-`[spotify]
+[spotify]
 clientId = longstring
 clientSecret = longstring
 ```
