@@ -14,6 +14,7 @@ from util.command import filterCommand
 from plugins.help import HelpCategory
 
 from .common import join_artists, format_track, progress_bar
+from .session import sess
 
 import logging
 logger = logging.getLogger(__name__)
@@ -33,9 +34,11 @@ HELP.add_help("queue", "add song to queue",
 				"add a track to spotify queue. A song URI can be given or a query to search for. " +
 				"Add `-preview` flag to include spotify track url and embedded preview.",
 				args="[-preview] <uri/song>")
-@alemiBot.on_message(is_superuser & filterCommand("queue", list(alemiBot.prefixes), flags=["-preview"]))
+@alemiBot.on_message(is_allowed & filterCommand("queue", list(alemiBot.prefixes), flags=["-preview"]))
 async def add_to_queue(client, message):
 	try:
+		if not sess.group_call or not sess.group_call.is_connected:
+			return await edit_or_reply(message, "`[!] → ` No active call")
 		if "arg" not in message.command:
 			return await edit_or_reply(message, "`[!] → ` No input")
 		preview = "-preview" in message.command["flags"]
@@ -55,9 +58,11 @@ async def add_to_queue(client, message):
 HELP.add_help("playing", "show current track",
 				"shows track currently being played, a progress bard and a preview. Add flag " +
 				"`-preview` to include spotify track url and embedded preview.", args="[-preview]")
-@alemiBot.on_message(is_superuser & filterCommand("playing", list(alemiBot.prefixes), flags=["-preview"]))
+@alemiBot.on_message(is_allowed & filterCommand("playing", list(alemiBot.prefixes), flags=["-preview"]))
 async def show_current_song(client, message):
 	try:
+		if not sess.group_call or not sess.group_call.is_connected:
+			return await edit_or_reply(message, "`[!] → ` No active call")
 		preview = "-preview" in message.command["flags"]
 		res = spotify.current_user_playing_track()
 		text = format_track(res["item"], preview=preview) + '\n' + progress_bar(res["progress_ms"], res['item']['duration_ms'])
@@ -67,9 +72,11 @@ async def show_current_song(client, message):
 		await edit_or_reply(message, "`[!] → ` " + str(e))
 
 HELP.add_help("skip", "skip current track", "skip current track")
-@alemiBot.on_message(is_superuser & filterCommand("skip", list(alemiBot.prefixes)))
+@alemiBot.on_message(is_allowed & filterCommand("skip", list(alemiBot.prefixes)))
 async def skip_track(client, message):
 	try:
+		if not sess.group_call or not sess.group_call.is_connected:
+			return await edit_or_reply(message, "`[!] → ` No active call")
 		spotify.next_track()
 		await edit_or_reply(message, "` → ` Skipped")
 	except Exception as e:
