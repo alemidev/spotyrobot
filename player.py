@@ -23,7 +23,7 @@ from plugins.spotyrobot.session import sess
 import logging
 logger = logging.getLogger(__name__)
 
-HELP = HelpCategory("SPOTIFY")
+HELP = HelpCategory("PLAYER")
 
 @alemiBot.on_message(is_superuser & filters.voice_chat_members_invited)
 async def invited_to_voice_chat(client, message):
