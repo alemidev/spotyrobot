@@ -28,22 +28,28 @@ password = doesntNeedToBeQuotedIfYouDontHaveQuotesInPwd
 ```
 
 ### Controlling spotify
-To be able to control spotify playback, you need to make an application in your spotify dashboard. Find your `clientId` and `clientSecret` and add them to your config file under the `[spotify]` category:
+To be able to control spotify playback, you need to create an application in your spotify dashboard. Find your `clientId` and `clientSecret` and add them to your config file under the `[spotify]` category:
 ```ini
 [spotify]
 clientId = longstring
 clientSecret = longstring
 ```
-When you first boot the bot with `control` enabled, you will be prompted on the terminal to open an URL and paste back the URL you get redirected to. This should happen only once and will be doable in telegram messages eventually, but for now check your terminal and follow the instructions.
+When you first boot the bot with `control` enabled, you will need to generate an authentication token. A token is needed to manage playback. Once acquired, it can be refreshed.
+
+You will be prompted on the terminal open an URL, authorize on spotify page and paste back the URL you get redirected to.
 
 # Commands
 You can find spoty-robot commands in main help, with more details on flags and arguments
 
 ### Player
-Invite your music bot to the voice call to have it join (or with `/join`), and use `/leave` to make it disconnect. You can toggle `/mute` and make it set its `/volume`. All these commands are reserved to superusers.
+All these commands are reserved to superusers.
+* `/join [-debug] [-n <name>] [-t <type>]` will start a session: connect to voice call, start spotify player and wait for audio. You can specify spotify device name and type. You can also just invite the player to the group call.
+* `/leave` will stop spotify player and leave group call
+* `/volume <n>` will set bot volume to specified value. Only works if bot has "Manage Voice Call" permission
+* `/mute` will toggle mute
 
 ### Control
-All these commands are available to trusted users
-* `/queue <q>` will add a track to the queue. It can be a spotify URI, url or search query
+All these commands are available to trusted users, and will only work while in a group call
+* `/queue [-preview] <url/uri/query>` will add a track to the queue. It can be a spotify URI, url or search query, with optional preview and album art
+* `/playing [-preview]` will show current playing track with progress, with optional preview and album art
 * `/skip` will skip to next track
-* `/playing` will show current playing track with progress
