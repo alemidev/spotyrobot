@@ -13,6 +13,8 @@ from util.command import filterCommand
 
 from plugins.help import HelpCategory
 
+from .common import join_artists, format_track, progress_bar
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -26,10 +28,6 @@ auth = SpotifyOAuth(username=alemiBot.config.get("spotify", "username", fallback
                     open_browser=False)
 spotify = Spotify(auth_manager=auth)
 logger.debug(str(spotify.current_user()))
-
-def join_artists(artists):
-	return ",".join([artist["name"] for artist in artists])
-
 
 HELP.add_help("queue", "add song to queue",
 				"add a track to spotify queue. A song URI can be given or a query to search for.",
@@ -45,11 +43,9 @@ async def add_to_queue(client, message):
 			await edit_or_reply(message, "` → ` Added to queue")
 		else:
 			res = spotify.search(q, limit=1)
-			uri = res["tracks"]["items"][0]["uri"]
-			text = join_artists(res["tracks"]["items"][0]["artists"]) + " - " + \
-					f"[{res['tracks']['items'][0]['name']}]({res['tracks']['items'][0]['external_urls']['spotify']})"
-			spotify.add_to_queue(uri)
-			await edit_or_reply(message, f"` → ` Added `{text}`")
+			spotify.add_to_queue(res["tracks"]["items"][0]["uri"])
+			text = format_track(res["tracks"]["items"][0])
+			await edit_or_reply(message, f"` → ` Added:\n{text}")
 	except Exception as e:
 		logger.exception("Error in .queue command")
 		await edit_or_reply(message, "`[!] → ` " + str(e))
@@ -60,8 +56,7 @@ HELP.add_help("playing", "show current track", "print `<artist> - <title> [<albu
 async def show_current_song(client, message):
 	try:
 		res = spotify.current_user_playing_track()
-		text = f"**{join_artists(res['item']['artists'])}** - [{res['item']['name']}]({res['item']['external_urls']['spotify']}) (_{res['item']['album']['name']}_) " + \
-				f"[{res['progress_ms']/1000:.0f}/{res['item']['duration_ms']/1000:.0f}]"
+		text = format_track(res["item"]) + '\n' + progress_bar(res["progress_ms"], res['item']['duration_ms'])
 		await edit_or_reply(message, f"` → ` {text}")
 	except Exception as e:
 		logger.exception("Error in .playing command")
