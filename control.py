@@ -25,7 +25,7 @@ auth = SpotifyOAuth(username=alemiBot.config.get("spotify", "username", fallback
                     scope="user-modify-playback-state user-read-currently-playing",
                     client_id=alemiBot.config.get("spotify", "clientId", fallback=None),
                     client_secret=alemiBot.config.get("spotify", "clientSecret", fallback=None),
-                    redirect_uri='https://alemi.dev/spotify',
+                    redirect_uri='https://alemi.dev/spotify.html',
                     open_browser=False)
 spotify = Spotify(auth_manager=auth)
 logger.debug(str(spotify.current_user()))
