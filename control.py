@@ -33,7 +33,7 @@ logger.debug(str(spotify.current_user()))
 HELP.add_help("queue", "add song to queue",
 				"add a track to spotify queue. A song URI can be given or a query to search for. " +
 				"Add `-preview` flag to include spotify track url and embedded preview.",
-				args="[-preview] <uri/song>")
+				args="[-preview] <uri/song>", public=True)
 @alemiBot.on_message(is_allowed & filterCommand("queue", list(alemiBot.prefixes), flags=["-preview"]))
 async def add_to_queue(client, message):
 	try:
@@ -57,7 +57,7 @@ async def add_to_queue(client, message):
 
 HELP.add_help("playing", "show current track",
 				"shows track currently being played, a progress bard and a preview. Add flag " +
-				"`-preview` to include spotify track url and embedded preview.", args="[-preview]")
+				"`-preview` to include spotify track url and embedded preview.", args="[-preview]", public=True)
 @alemiBot.on_message(is_allowed & filterCommand("playing", list(alemiBot.prefixes), flags=["-preview"]))
 async def show_current_song(client, message):
 	try:
@@ -71,7 +71,7 @@ async def show_current_song(client, message):
 		logger.exception("Error in .playing command")
 		await edit_or_reply(message, "`[!] → ` " + str(e))
 
-HELP.add_help("skip", "skip current track", "skip current track")
+HELP.add_help("skip", "skip current track", "skip current track", public=True)
 @alemiBot.on_message(is_allowed & filterCommand("skip", list(alemiBot.prefixes)))
 async def skip_track(client, message):
 	try:
