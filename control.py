@@ -30,13 +30,15 @@ spotify = Spotify(auth_manager=auth)
 logger.debug(str(spotify.current_user()))
 
 HELP.add_help("queue", "add song to queue",
-				"add a track to spotify queue. A song URI can be given or a query to search for.",
-				args="<q>")
-@alemiBot.on_message(is_superuser & filterCommand("queue", list(alemiBot.prefixes)))
+				"add a track to spotify queue. A song URI can be given or a query to search for. " +
+				"Add `-nolink` flag to avoid sending a spotify track url (to avoid floodwaits).",
+				args="[-nolink] <uri/song>")
+@alemiBot.on_message(is_superuser & filterCommand("queue", list(alemiBot.prefixes), flags=["-nolink"]))
 async def add_to_queue(client, message):
 	try:
 		if "arg" not in message.command:
 			return await edit_or_reply(message, "`[!] → ` No input")
+		preview = "-nolink" not in message.command["flags"]
 		q = message.command["arg"]
 		if q.startswith("spotify:") or q.startswith("http://open.spotify.com"):
 			spotify.add_to_queue(q)
@@ -44,19 +46,21 @@ async def add_to_queue(client, message):
 		else:
 			res = spotify.search(q, limit=1)
 			spotify.add_to_queue(res["tracks"]["items"][0]["uri"])
-			text = format_track(res["tracks"]["items"][0])
-			await edit_or_reply(message, f"` → ` Added:\n{text}")
+			text = format_track(res["tracks"]["items"][0], preview=preview)
+			await edit_or_reply(message, f"` → ` Added to queue : {text}", disable_web_page_preview=True)
 	except Exception as e:
 		logger.exception("Error in .queue command")
 		await edit_or_reply(message, "`[!] → ` " + str(e))
 
-
-HELP.add_help("playing", "show current track", "print `<artist> - <title> [<album>]`")
-@alemiBot.on_message(is_superuser & filterCommand("playing", list(alemiBot.prefixes)))
+HELP.add_help("playing", "show current track",
+				"shows track currently being played, a progress bard and a preview. Add flag " +
+				"`-nolink` to exclude preview (to avoid floodwaits)", args="[-nolink]")
+@alemiBot.on_message(is_superuser & filterCommand("playing", list(alemiBot.prefixes), flags=["-nolink"]))
 async def show_current_song(client, message):
 	try:
+		preview = "-nolink" not in message.command["flags"]
 		res = spotify.current_user_playing_track()
-		text = format_track(res["item"]) + '\n' + progress_bar(res["progress_ms"], res['item']['duration_ms'])
+		text = format_track(res["item"], preview=preview) + '\n' + progress_bar(res["progress_ms"], res['item']['duration_ms'])
 		await edit_or_reply(message, f"` → ` {text}")
 	except Exception as e:
 		logger.exception("Error in .playing command")

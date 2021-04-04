@@ -1,9 +1,11 @@
 def join_artists(artists):
 	return ",".join([artist["name"] for artist in artists])
 
-def format_track(track):
-	return  f"**{join_artists(track['artists'])}** - " + \
-			f"[{track['name']}]({track['external_urls']['spotify']})"
+def format_track(track, preview=True):
+	if preview:
+		return f"**{join_artists(track['artists'])}** - [{track['name']}]({track['external_urls']['spotify']})"
+	return  f"**{join_artists(track['artists'])}** - {track['name']}"
+		
 
 def format_time(ms):
 	return f"{(ms//1000)//60:01}:{(ms//1000)%60:02}"
