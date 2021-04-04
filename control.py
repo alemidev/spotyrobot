@@ -82,3 +82,24 @@ async def skip_track(client, message):
 	except Exception as e:
 		logger.exception("Error in .skip command")
 		await edit_or_reply(message, "`[!] → ` " + str(e))
+
+
+HELP.add_help(["search"], "search a song on spotify",
+				"will use your query to search a song on spotify and retrieve the URI. Use this to " +
+				"search the song you want before queing if it's not a common one", args="[-preview] <song>", public=True)
+@alemiBot.on_message(is_allowed & filterCommand("search", list(alemiBot.prefixes), flags=["-preview"]))
+async def search_track(client, message):
+	try:
+		if not sess.group_call or not sess.group_call.is_connected:
+			return await edit_or_reply(message, "`[!] → ` No active call")
+		if "arg" not in message.command:
+			return await edit_or_reply(message, "`[!] → ` No input")
+		preview = "-preview" in message.command["flags"]
+		q = message.command["arg"]
+		res = spotify.search(q, limit=1)
+		text = format_track(res["tracks"]["items"][0], preview=preview)
+		text += f"\nURI | `{res['tracks']['items'][0]['uri']}`"
+		await edit_or_reply(message, f"` → ` {text}")
+	except Exception as e:
+		logger.exception("Error in .queue command")
+		await edit_or_reply(message, "`[!] → ` " + str(e))
