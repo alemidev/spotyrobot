@@ -10,6 +10,6 @@ def format_track(track, preview=False):
 def format_time(ms):
 	return f"{(ms//1000)//60:01}:{(ms//1000)%60:02}"
 
-def progress_bar(curr, tot, length=14):
+def progress_bar(curr, tot, length=12):
 	index = int((curr*length)/tot)
 	return f"`{format_time(curr)}` {'─'*index}|{'─'*(length-index-1)} `{format_time(tot)}`"
