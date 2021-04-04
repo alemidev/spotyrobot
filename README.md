@@ -36,5 +36,14 @@ clientSecret = longstring
 ```
 When you first boot the bot with `control` enabled, you will be prompted on the terminal to open an URL and paste back the URL you get redirected to. This should happen only once and will be doable in telegram messages eventually, but for now check your terminal and follow the instructions.
 
-## Commands
-You can find spoty-robot commands in main help. As of now, invite your music bot to the voice call to have it join, and use `/leave` to make it disconnect.
+# Commands
+You can find spoty-robot commands in main help, with more details on flags and arguments
+
+### Player
+Invite your music bot to the voice call to have it join (or with `/join`), and use `/leave` to make it disconnect. You can toggle `/mute` and make it set its `/volume`. All these commands are reserved to superusers.
+
+### Control
+All these commands are available to trusted users
+* `/queue <q>` will add a track to the queue. It can be a spotify URI, url or search query
+* `/skip` will skip to next track
+* `/playing` will show current playing track with progress
