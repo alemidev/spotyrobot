@@ -1,7 +1,7 @@
 def join_artists(artists):
 	return ",".join([artist["name"] for artist in artists])
 
-def format_track(track, preview=True):
+def format_track(track, preview=False):
 	if preview:
 		return f"**{join_artists(track['artists'])}** - [{track['name']}]({track['external_urls']['spotify']})"
 	return  f"**{join_artists(track['artists'])}** - {track['name']}"
