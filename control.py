@@ -61,3 +61,13 @@ async def show_current_song(client, message):
 	except Exception as e:
 		logger.exception("Error in .playing command")
 		await edit_or_reply(message, "`[!] → ` " + str(e))
+
+HELP.add_help("skip", "skip current track", "skip current track")
+@alemiBot.on_message(is_superuser & filterCommand("skip", list(alemiBot.prefixes)))
+async def skip_track(client, message):
+	try:
+		spotify.next_track()
+		await edit_or_reply(message, "` → ` Skipped")
+	except Exception as e:
+		logger.exception("Error in .skip command")
+		await edit_or_reply(message, "`[!] → ` " + str(e))
