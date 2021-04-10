@@ -80,8 +80,6 @@ HELP.add_help(["search"], "search a song on spotify",
 @alemiBot.on_message(is_allowed & filterCommand("search", list(alemiBot.prefixes), flags=["-preview"]))
 @report_error(logger)
 async def search_track_cmd(client, message):
-	if not sess.group_call or not sess.group_call.is_connected:
-		return await edit_or_reply(message, "`[!] → ` No active call")
 	if "arg" not in message.command:
 		return await edit_or_reply(message, "`[!] → ` No input")
 	preview = "-preview" in message.command["flags"]
