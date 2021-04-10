@@ -10,8 +10,8 @@ from bot import alemiBot
 from util.permission import is_allowed, is_superuser
 from util.message import edit_or_reply
 from util.command import filterCommand
-
-from plugins.help import HelpCategory
+from util.decorators import report_error
+from util.help import HelpCategory
 
 from .common import join_artists, format_track, progress_bar
 from .session import sess
@@ -35,71 +35,58 @@ HELP.add_help("queue", "add song to queue",
 				"Add `-preview` flag to include spotify track url and embedded preview.",
 				args="[-preview] <uri/song>", public=True)
 @alemiBot.on_message(is_allowed & filterCommand("queue", list(alemiBot.prefixes), flags=["-preview"]))
-async def add_to_queue(client, message):
-	try:
-		if not sess.group_call or not sess.group_call.is_connected:
-			return await edit_or_reply(message, "`[!] → ` No active call")
-		if "arg" not in message.command:
-			return await edit_or_reply(message, "`[!] → ` No input")
-		preview = "-preview" in message.command["flags"]
-		q = message.command["arg"]
-		if q.startswith("spotify:") or q.startswith("http://open.spotify.com"):
-			spotify.add_to_queue(q)
-			await edit_or_reply(message, "` → ` Added to queue")
-		else:
-			res = spotify.search(q, limit=1)
-			spotify.add_to_queue(res["tracks"]["items"][0]["uri"])
-			text = format_track(res["tracks"]["items"][0], preview=preview)
-			await edit_or_reply(message, f"` → ` Added to queue : {text}", disable_web_page_preview=True)
-	except Exception as e:
-		logger.exception("Error in .queue command")
-		await edit_or_reply(message, "`[!] → ` " + str(e))
+@report_error(logger)
+async def add_to_queue_cmd(client, message):
+	if not sess.group_call or not sess.group_call.is_connected:
+		return await edit_or_reply(message, "`[!] → ` No active call")
+	if "arg" not in message.command:
+		return await edit_or_reply(message, "`[!] → ` No input")
+	preview = "-preview" in message.command["flags"]
+	q = message.command["arg"]
+	if q.startswith("spotify:") or q.startswith("http://open.spotify.com"):
+		spotify.add_to_queue(q)
+		await edit_or_reply(message, "` → ` Added to queue")
+	else:
+		res = spotify.search(q, limit=1)
+		spotify.add_to_queue(res["tracks"]["items"][0]["uri"])
+		text = format_track(res["tracks"]["items"][0], preview=preview)
+		await edit_or_reply(message, f"` → ` Added to queue : {text}", disable_web_page_preview=True)
 
 HELP.add_help("playing", "show current track",
 				"shows track currently being played, a progress bard and a preview. Add flag " +
 				"`-preview` to include spotify track url and embedded preview.", args="[-preview]", public=True)
 @alemiBot.on_message(is_allowed & filterCommand("playing", list(alemiBot.prefixes), flags=["-preview"]))
-async def show_current_song(client, message):
-	try:
-		if not sess.group_call or not sess.group_call.is_connected:
-			return await edit_or_reply(message, "`[!] → ` No active call")
-		preview = "-preview" in message.command["flags"]
-		res = spotify.current_user_playing_track()
-		text = format_track(res["item"], preview=preview) + '\n' + progress_bar(res["progress_ms"], res['item']['duration_ms'])
-		await edit_or_reply(message, f"` → ` {text}")
-	except Exception as e:
-		logger.exception("Error in .playing command")
-		await edit_or_reply(message, "`[!] → ` " + str(e))
+@report_error(logger)
+async def show_current_song_cmd(client, message):
+	if not sess.group_call or not sess.group_call.is_connected:
+		return await edit_or_reply(message, "`[!] → ` No active call")
+	preview = "-preview" in message.command["flags"]
+	res = spotify.current_user_playing_track()
+	text = format_track(res["item"], preview=preview) + '\n' + progress_bar(res["progress_ms"], res['item']['duration_ms'])
+	await edit_or_reply(message, f"` → ` {text}")
 
 HELP.add_help("skip", "skip current track", "skip current track", public=True)
 @alemiBot.on_message(is_allowed & filterCommand("skip", list(alemiBot.prefixes)))
-async def skip_track(client, message):
-	try:
-		if not sess.group_call or not sess.group_call.is_connected:
-			return await edit_or_reply(message, "`[!] → ` No active call")
-		spotify.next_track()
-		await edit_or_reply(message, "` → ` Skipped")
-	except Exception as e:
-		logger.exception("Error in .skip command")
-		await edit_or_reply(message, "`[!] → ` " + str(e))
-
+@report_error(logger)
+async def skip_track_cmd(client, message):
+	if not sess.group_call or not sess.group_call.is_connected:
+		return await edit_or_reply(message, "`[!] → ` No active call")
+	spotify.next_track()
+	await edit_or_reply(message, "` → ` Skipped")
 
 HELP.add_help(["search"], "search a song on spotify",
 				"will use your query to search a song on spotify and retrieve the URI. Use this to " +
 				"search the song you want before queing if it's not a common one", args="[-preview] <song>", public=True)
 @alemiBot.on_message(is_allowed & filterCommand("search", list(alemiBot.prefixes), flags=["-preview"]))
-async def search_track(client, message):
-	try:
-		if not sess.group_call or not sess.group_call.is_connected:
-			return await edit_or_reply(message, "`[!] → ` No active call")
-		if "arg" not in message.command:
-			return await edit_or_reply(message, "`[!] → ` No input")
-		preview = "-preview" in message.command["flags"]
-		q = message.command["arg"]
-		res = spotify.search(q, limit=1)
-		text = format_track(res["tracks"]["items"][0], preview=preview)
-		text += f"\nURI | `{res['tracks']['items'][0]['uri']}`"
-		await edit_or_reply(message, f"` → ` {text}")
-	except Exception as e:
-		logger.exception("Error in .queue command")
-		await edit_or_reply(message, "`[!] → ` " + str(e))
+@report_error(logger)
+async def search_track_cmd(client, message):
+	if not sess.group_call or not sess.group_call.is_connected:
+		return await edit_or_reply(message, "`[!] → ` No active call")
+	if "arg" not in message.command:
+		return await edit_or_reply(message, "`[!] → ` No input")
+	preview = "-preview" in message.command["flags"]
+	q = message.command["arg"]
+	res = spotify.search(q, limit=1)
+	text = format_track(res["tracks"]["items"][0], preview=preview)
+	text += f"\nURI | `{res['tracks']['items'][0]['uri']}`"
+	await edit_or_reply(message, f"` → ` {text}")
