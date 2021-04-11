@@ -37,8 +37,9 @@ class Session:
 			self.spoty_log = open("data/spoty.log", "w")
 			self.ffmpeg_log = open("data/ffmpeg.log", "w")
 		self.spotify_process = subprocess.Popen(
-			["./data/librespot", "--name", device_name, "--device-type", device_type, "--backend", "pipe",
-			 "--device", "./data/raw-fifo", "-u", username, "-p", password, "--passthrough"],
+			["./data/librespot", "--name", device_name, "--device-type", device_type,
+			 "--backend", "pipe", "--device", "./data/raw-fifo", "-u", username, "-p", password,
+			 "--passthrough", "--onevent", "python plugins/spotyrobot/on_event.py"],
 			stderr=subprocess.STDOUT, stdout=self.spoty_log # if it's none it inherits stdout from parent
 		)
 		# # option "quiet" still sends output to pipe, need to send it to DEVNULL!
