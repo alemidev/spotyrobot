@@ -4,6 +4,8 @@ import os
 from signal import SIGINT
 
 # import ffmpeg
+from pyrogram.raw.types import InputGroupCall
+from pyrogram.raw.functions.phone import EditGroupCallTitle
 
 from bot import alemiBot
 
@@ -15,6 +17,13 @@ class Session:
 		self.muted = False
 		self.spoty_log = None
 		self.ffmpeg_log = None
+
+	async def set_title(self, title):
+		call = InputGroupCall(
+				id=self.group_call.group_call.id,
+				access_hash=self.group_call.group_call.access_hash)
+		raw_fun = EditGroupCallTitle(call=call, title=title)
+		await self.group_call.client.send(raw_fun)
 
 	def start(self, device_name="SpotyRobot", device_type="speaker", quiet=True):
 		username = alemiBot.config.get("spotify", "username", fallback=None)
