@@ -28,31 +28,32 @@ class Session:
 	def start(self, device_name="SpotyRobot", device_type="speaker", quiet=True):
 		username = alemiBot.config.get("spotify", "username", fallback=None)
 		password = alemiBot.config.get("spotify", "password", fallback=None)
+		cwd = os.getcwd()
 		try:
-			os.mkfifo("data/raw-fifo")
-			os.mkfifo("data/music-fifo")
+			os.mkfifo("plugins/spotyrobot/data/raw-fifo")
+			os.mkfifo("plugins/spotyrobot/data/music-fifo")
 		except FileExistsError:
 			pass
 		if quiet:
-			self.spoty_log = open("data/spoty.log", "w")
-			self.ffmpeg_log = open("data/ffmpeg.log", "w")
+			self.spoty_log = open("plugins/spotyrobot/data/spoty.log", "w")
+			self.ffmpeg_log = open("plugins/spotyrobot/data/ffmpeg.log", "w")
 		self.spotify_process = subprocess.Popen(
-			["./data/librespot", "--name", device_name, "--device-type", device_type,
-			 "--backend", "pipe", "--device", "./data/raw-fifo", "-u", username, "-p", password,
-			 "--passthrough", "--onevent", "python plugins/spotyrobot/on_event.py"],
+			["./plugins/spotyrobot/data/librespot", "--name", device_name, "--device-type", device_type,
+			 "--backend", "pipe", "--device", "plugins/spotyrobot/data/raw-fifo", "-u", username, "-p", password,
+			 "--passthrough", "--onevent", f"{cwd}/plugins/spotyrobot/on_event.py" ],
 			stderr=subprocess.STDOUT, stdout=self.spoty_log # if it's none it inherits stdout from parent
 		)
 		# # option "quiet" still sends output to pipe, need to send it to DEVNULL!
-		# self.ffmpeg_process = ffmpeg.input("data/raw-fifo").output(
-		# 	"data/music-fifo",
+		# self.ffmpeg_process = ffmpeg.input("plugins/spotyrobot/data/raw-fifo").output(
+		# 	"plugins/spotyrobot/data/music-fifo",
 		# 	format='s16le',
 		# 	acodec='pcm_s16le',
 		# 	ac=2,
 		# 	ar='48k'
 		# ).overwrite_output().run_async(quiet=quiet)
 		self.ffmpeg_process = subprocess.Popen(
-			["ffmpeg", "-y", "-i", "data/raw-fifo", "-f", "s16le", "-ac", "2",
-			 "-ar", "48000", "-acodec", "pcm_s16le", "data/music-fifo"],
+			["ffmpeg", "-y", "-i", "plugins/spotyrobot/data/raw-fifo", "-f", "s16le", "-ac", "2",
+			 "-ar", "48000", "-acodec", "pcm_s16le", "plugins/spotyrobot/data/music-fifo"],
 			stderr=subprocess.STDOUT, stdout=self.ffmpeg_log,
 		)
 
@@ -73,7 +74,10 @@ class Session:
 		if self.ffmpeg_log is not None:
 			self.ffmpeg_log.close()
 			self.ffmpeg_log = None
-		os.remove("data/music-fifo")
-		os.remove("data/raw-fifo")
+		try:
+			os.remove("plugins/spotyrobot/data/music-fifo")
+			os.remove("plugins/spotyrobot/data/raw-fifo")
+		except FileNotFoundError:
+			pass
 
 sess = Session()

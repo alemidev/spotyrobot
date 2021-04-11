@@ -31,7 +31,8 @@ async def invited_to_voice_chat(client, message):
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
 	try:
 		sess.start()
-		sess.group_call = GroupCall(client, "data/music-fifo")
+		sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
+							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
 		await sess.group_call.start(message.chat.id)
 	except:
 		logger.exception("Error while joining voice chat")
@@ -54,7 +55,8 @@ async def join_call_start_radio_cmd(client, message):
 	devicetype = message.command["type"] if "type" in message.command else "speaker"
 	quiet = "-debug" not in message.command["flags"]
 	sess.start(device_name=devicename, device_type=devicetype, quiet=quiet)
-	sess.group_call = GroupCall(client, "data/music-fifo")
+	sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
+							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
 	await sess.group_call.start(message.chat.id)
 	await edit_or_reply(message, "` → ` Connected")
 
