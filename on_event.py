@@ -19,15 +19,14 @@ if __name__ == "__main__":
 		entry = dict(os.environ)
 	
 	data = []
-	if os.path.isfile("plugins/spotyrobot/events.json"):
-		with open("plugins/spotyrobot/events.json") as f:
+	if os.path.isfile("plugins/spotyrobot/data/events.json"):
+		with open("plugins/spotyrobot/data/events.json") as f:
 			data = json.load(f)
-	
-	if not type(data) is list:
-		data = []
+		if type(data) is not list:
+			data = [data]
 	
 	data.append(entry)
 	
-	with open("plugins/spotyrobot/events.json", "w") as f:
+	with open("plugins/spotyrobot/data/events.json", "w") as f:
 		json.dump(data, f)
 
