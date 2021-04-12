@@ -3,14 +3,20 @@ import os
 import json
 
 if __name__ == "__main__":
-	entry = dict(os.environ)
-	try:
-		event = os.environ["PLAYER_EVENT"]
-		track_id = os.environ["TRACK_ID"]
-		old_track_id = os.environ["OLD_TRACK_ID"]
-		entry = {"event": event, "track": track_id, "previous": old_track_id}
-	except:
-		pass
+	event = os.environ["PLAYER_EVENT"]
+	if event in ("playing", "paused"):
+		entry = {"event": event,
+				 "duration": int(os.environ["DURATION_MS"]),
+				 "position": int(os.environ["POSITION_MS"]),
+				 "track": os.environ["TRACK_ID"]}
+	elif event == "started":
+		entry = {"event": event, "track": os.environ["TRACK_ID"]}
+	elif event == "stopped":
+		envry = dict(os.environ) # never seen this actually
+	elif event == "volume_set":
+		entry = {"event": event, "volume" : int(os.environ["VOLUME"])}
+	else:
+		entry = dict(os.environ)
 	
 	data = []
 	if os.path.isfile("plugins/spotyrobot/events.json"):
