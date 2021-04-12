@@ -12,4 +12,4 @@ def format_time(ms):
 
 def progress_bar(curr, tot, length=12):
 	index = int((curr*length)/tot)
-	return f"`{format_time(curr)}` {'─'*index}|{'─'*(length-index-1)} `{format_time(tot)}`"
+	return f"`{format_time(curr)}` {'━'*index}◉{'─'*(length-index-1)} `{format_time(tot)}`"
