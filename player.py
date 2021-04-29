@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 
 from signal import SIGINT
 
@@ -60,6 +61,7 @@ async def join_call_start_radio_cmd(client, message):
 	await sess.group_call.start(message.chat.id)
 	await edit_or_reply(message, "` → ` Connected")
 
+INVITE_SPLIT = re.compile(r"http(?:s|)://t(?:elegram|).me/(?P<group>.*)\?voicechat=(?P<invite>.*)")
 @alemiBot.on_message(is_superuser & filters.web_page)
 async def invited_to_voice_chat_via_link(client, message):
 	if sess.group_call and sess.group_call.is_connected:
@@ -67,10 +69,11 @@ async def invited_to_voice_chat_via_link(client, message):
 	if message.web_page.type != "telegram_voicechat":
 		return
 	try:
+		match = INVITE_SPLIT.match(message.web_page.url)
 		sess.start()
 		sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
 							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
-		await sess.group_call.start(message.web_page.url)
+		await sess.group_call.start(match["group"], invite_hash=match["invite"])
 	except:
 		logger.exception("Error while joining voice chat")
 
