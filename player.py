@@ -16,7 +16,7 @@ from bot import alemiBot
 from util.permission import is_allowed, is_superuser
 from util.message import edit_or_reply
 from util.command import filterCommand
-from util.decorators import report_error
+from util.decorators import report_error, set_offline
 from util.help import HelpCategory
 
 from plugins.spotyrobot.session import sess
@@ -65,23 +65,22 @@ voice_chat_invite = filters.create(lambda _, __, msg: msg.web_page.type == "tele
 
 INVITE_SPLIT = re.compile(r"http(?:s|)://t(?:elegram|).me/(?P<group>.*)\?voicechat=(?P<invite>.*)")
 @alemiBot.on_message(is_superuser & filters.web_page & voice_chat_invite)
+@report_error(logger)
 async def invited_to_voice_chat_via_link(client, message):
 	if sess.group_call and sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
-	try:
-		match = INVITE_SPLIT.match(message.web_page.url)
-		sess.start()
-		sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
-							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
-		await sess.group_call.start(match["group"], invite_hash=match["invite"])
-	except:
-		logger.exception("Error while joining voice chat")
+	match = INVITE_SPLIT.match(message.web_page.url)
+	sess.start()
+	sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
+						path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
+	await sess.group_call.start(match["group"], invite_hash=match["invite"])
 
 HELP.add_help("leave", "stop radio and leave call",
 				"will first stop playback, then try to terminate both librespot and ffmpeg, " +
 				"and then leave the voice call.")
 @alemiBot.on_message(is_superuser & filterCommand("leave", list(alemiBot.prefixes)))
 @report_error(logger)
+@set_offline
 async def stop_radio_cmd(client, message):
 	sess.group_call.stop_playout()
 	sess.stop()
