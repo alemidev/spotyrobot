@@ -60,6 +60,20 @@ async def join_call_start_radio_cmd(client, message):
 	await sess.group_call.start(message.chat.id)
 	await edit_or_reply(message, "` → ` Connected")
 
+@alemiBot.on_message(is_superuser & filters.web_page)
+async def invited_to_voice_chat_via_link(client, message):
+	if sess.group_call and sess.group_call.is_connected:
+		return await edit_or_reply(message, "`[!] → ` Already in another call")
+	if message.web_page.type != "telegram_voicechat":
+		return
+	try:
+		sess.start()
+		sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
+							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
+		await sess.group_call.start(message.web_page.url)
+	except:
+		logger.exception("Error while joining voice chat")
+
 HELP.add_help("leave", "stop radio and leave call",
 				"will first stop playback, then try to terminate both librespot and ffmpeg, " +
 				"and then leave the voice call.")
