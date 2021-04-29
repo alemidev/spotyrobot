@@ -61,13 +61,13 @@ async def join_call_start_radio_cmd(client, message):
 	await sess.group_call.start(message.chat.id)
 	await edit_or_reply(message, "` → ` Connected")
 
+voice_chat_invite = filters.create(lambda _, __, msg: msg.web_page.type == "telegram_voicechat")
+
 INVITE_SPLIT = re.compile(r"http(?:s|)://t(?:elegram|).me/(?P<group>.*)\?voicechat=(?P<invite>.*)")
-@alemiBot.on_message(is_superuser & filters.web_page)
+@alemiBot.on_message(is_superuser & filters.web_page & voice_chat_invite)
 async def invited_to_voice_chat_via_link(client, message):
 	if sess.group_call and sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
-	if message.web_page.type != "telegram_voicechat":
-		return
 	try:
 		match = INVITE_SPLIT.match(message.web_page.url)
 		sess.start()
