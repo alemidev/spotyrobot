@@ -74,10 +74,5 @@ class Session:
 		if self.ffmpeg_log is not None:
 			self.ffmpeg_log.close()
 			self.ffmpeg_log = None
-		try:
-			os.remove("plugins/spotyrobot/data/music-fifo")
-			os.remove("plugins/spotyrobot/data/raw-fifo")
-		except FileNotFoundError:
-			pass
 
 sess = Session()
