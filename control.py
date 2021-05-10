@@ -39,10 +39,10 @@ HELP.add_help("queue", "add song to queue",
 async def add_to_queue_cmd(client, message):
 	if not sess.group_call or not sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` No active call")
-	if "arg" not in message.command:
+	if len(message.command) < 1:
 		return await edit_or_reply(message, "`[!] → ` No input")
-	preview = "-preview" in message.command["flags"]
-	q = message.command["arg"]
+	preview = message.command["-preview"]
+	q = message.command.text
 	if q.startswith("spotify:") or q.startswith("http://open.spotify.com"):
 		spotify.add_to_queue(q)
 		await edit_or_reply(message, "` → ` Added to queue")
@@ -60,7 +60,7 @@ HELP.add_help("playing", "show current track",
 async def show_current_song_cmd(client, message):
 	if not sess.group_call or not sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` No active call")
-	preview = "-preview" in message.command["flags"]
+	preview = message.command["-preview"]
 	res = spotify.current_user_playing_track()
 	text = format_track(res["item"], preview=preview) + '\n' + progress_bar(res["progress_ms"], res['item']['duration_ms'])
 	await edit_or_reply(message, f"` → ` {text}")
@@ -80,10 +80,10 @@ HELP.add_help(["search"], "search a song on spotify",
 @alemiBot.on_message(is_allowed & filterCommand("search", list(alemiBot.prefixes), flags=["-preview"]))
 @report_error(logger)
 async def search_track_cmd(client, message):
-	if "arg" not in message.command:
+	if len(message.command) < 1:
 		return await edit_or_reply(message, "`[!] → ` No input")
-	preview = "-preview" in message.command["flags"]
-	q = message.command["arg"]
+	preview = message.command["-preview"]
+	q = message.command.text
 	res = spotify.search(q, limit=1)
 	text = format_track(res["tracks"]["items"][0], preview=preview)
 	text += f"\nURI | `{res['tracks']['items'][0]['uri']}`"

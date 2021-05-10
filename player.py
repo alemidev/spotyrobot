@@ -52,9 +52,9 @@ HELP.add_help("join", "join call and start radio",
 async def join_call_start_radio_cmd(client, message):
 	if sess.group_call and sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
-	devicename = message.command["name"] if "name" in message.command else "SpotyRobot"
-	devicetype = message.command["type"] if "type" in message.command else "speaker"
-	quiet = "-debug" not in message.command["flags"]
+	devicename = message.command["name"] or "SpotyRobot"
+	devicetype = message.command["type"] or "speaker"
+	quiet = not message.command["-debug"]
 	sess.start(device_name=devicename, device_type=devicetype, quiet=quiet)
 	sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
 							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
@@ -92,9 +92,9 @@ HELP.add_help("volume", "set player volume",
 @alemiBot.on_message(is_superuser & filterCommand("volume", list(alemiBot.prefixes)))
 @report_error(logger)
 async def volume_cmd(client, message):
-	if "cmd" not in message.command:
-		return await edit_or_reply(message, "`[!] → ` No value given")
-	val = int(message.command["cmd"][1])
+	if len(message.command) < 1:
+		return await edit_or_reply(message, "`[!] → ` No input")
+	val = int(message.command[0])
 	await sess.group_call.set_my_volume(val)
 	await edit_or_reply(message, f"` → ` Volume set to {val}")
 
