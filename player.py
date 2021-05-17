@@ -28,6 +28,9 @@ HELP = HelpCategory("PLAYER")
 
 @alemiBot.on_message(is_superuser & filters.voice_chat_members_invited)
 async def invited_to_voice_chat(client, message):
+	invited = [ u.id for u in message.voice_chat_members_invited.users ]
+	if client.me.id not in invited:
+		return
 	if sess.group_call and sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
 	try:
@@ -64,7 +67,7 @@ async def join_call_start_radio_cmd(client, message):
 voice_chat_invite = filters.create(lambda _, __, msg: msg.web_page.type == "telegram_voicechat")
 
 INVITE_SPLIT = re.compile(r"http(?:s|)://t(?:elegram|).me/(?P<group>.*)\?voicechat=(?P<invite>.*)")
-@alemiBot.on_message(is_superuser & filters.web_page & voice_chat_invite)
+@alemiBot.on_message(filters.private & is_superuser & filters.web_page & voice_chat_invite)
 @report_error(logger)
 async def invited_to_voice_chat_via_link(client, message):
 	if sess.group_call and sess.group_call.is_connected:
