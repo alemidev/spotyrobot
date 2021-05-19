@@ -86,8 +86,8 @@ HELP.add_help("leave", "stop radio and leave call",
 @set_offline
 async def stop_radio_cmd(client, message):
 	# sess.group_call.stop_playout()
-	sess.stop()
 	await sess.group_call.stop()
+	sess.stop()
 	await edit_or_reply(message, "` → ` Disconnected")
 
 HELP.add_help("volume", "set player volume",
