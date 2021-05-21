@@ -62,6 +62,8 @@ async def show_current_song_cmd(client, message):
 		return await edit_or_reply(message, "`[!] → ` No active call")
 	preview = message.command["-preview"]
 	res = spotify.current_user_playing_track()
+	if not res:
+		return await edit_or_reply(message, "`[!] → ` Not playing anything")
 	text = format_track(res["item"], preview=preview) + '\n' + progress_bar(res["progress_ms"], res['item']['duration_ms'])
 	await edit_or_reply(message, f"` → ` {text}")
 
