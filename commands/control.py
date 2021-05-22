@@ -13,8 +13,8 @@ from util.command import filterCommand
 from util.decorators import report_error
 from util.help import HelpCategory
 
-from .common import join_artists, format_track, progress_bar
-from .session import sess
+from plugins.spotyrobot.common import join_artists, format_track, progress_bar
+from plugins.spotyrobot.session import sess
 
 import logging
 logger = logging.getLogger(__name__)

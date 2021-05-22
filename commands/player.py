@@ -37,6 +37,7 @@ async def invited_to_voice_chat(client, message):
 		sess.start()
 		sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
 							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
+		sess.chat_member = await client.get_chat_member(message.chat.id, "me")
 		await sess.group_call.start(message.chat.id)
 	except:
 		logger.exception("Error while joining voice chat")
@@ -61,6 +62,7 @@ async def join_call_start_radio_cmd(client, message):
 	sess.start(device_name=devicename, device_type=devicetype, quiet=quiet)
 	sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
 							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
+	sess.chat_member = await client.get_chat_member(message.chat.id, "me")
 	await sess.group_call.start(message.chat.id)
 	await edit_or_reply(message, "` → ` Connected")
 
@@ -76,6 +78,7 @@ async def invited_to_voice_chat_via_link(client, message):
 	sess.start()
 	sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
 						path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
+	sess.chat_member = await client.get_chat_member(message.chat.id, "me")
 	await sess.group_call.start(match["group"], invite_hash=match["invite"])
 
 HELP.add_help("leave", "stop radio and leave call",
@@ -97,6 +100,8 @@ HELP.add_help("volume", "set player volume",
 async def volume_cmd(client, message):
 	if len(message.command) < 1:
 		return await edit_or_reply(message, "`[!] → ` No input")
+	if sess.chat_member and not sess.chat_member.can_manage_voice_chats:
+		return await edit_or_reply(message, "`[!] → ` Can't manage voice chat")
 	val = int(message.command[0])
 	await sess.group_call.set_my_volume(val)
 	await edit_or_reply(message, f"` → ` Volume set to {val}")
