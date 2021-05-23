@@ -95,7 +95,7 @@ async def stop_radio_cmd(client, message):
 
 HELP.add_help("volume", "set player volume",
 				"make bot set its own call volume (must have rights to manage voice call)")
-@alemiBot.on_message(is_superuser & filterCommand("volume", list(alemiBot.prefixes)))
+@alemiBot.on_message(is_allowed & filterCommand("volume", list(alemiBot.prefixes)))
 @report_error(logger)
 async def volume_cmd(client, message):
 	if len(message.command) < 1:
@@ -107,7 +107,7 @@ async def volume_cmd(client, message):
 	await edit_or_reply(message, f"` → ` Volume set to {val}")
 
 HELP.add_help("mute", "toggle player mute", "make bot mute/unmute itself")
-@alemiBot.on_message(is_superuser & filterCommand("mute", list(alemiBot.prefixes)))
+@alemiBot.on_message(is_allowed & filterCommand("mute", list(alemiBot.prefixes)))
 @report_error(logger)
 async def mute_call_cmd(client, message):
 	sess.muted = not sess.muted
