@@ -17,6 +17,7 @@ class Session:
 		self.muted = False
 		self.spoty_log = None
 		self.ffmpeg_log = None
+		self.chat_member = None
 
 	async def set_title(self, title):
 		call = InputGroupCall(
@@ -74,5 +75,6 @@ class Session:
 		if self.ffmpeg_log is not None:
 			self.ffmpeg_log.close()
 			self.ffmpeg_log = None
+		self.chat_member = None
 
 sess = Session()

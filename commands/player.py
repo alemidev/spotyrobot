@@ -4,10 +4,11 @@ import re
 
 from signal import SIGINT
 
-import ffmpeg
+# import ffmpeg
 
 from pyrogram import filters
 from pyrogram.types import Message
+from pyrogram.errors import UserNotParticipant
 
 from pytgcalls import GroupCall
 
@@ -78,7 +79,10 @@ async def invited_to_voice_chat_via_link(client, message):
 	sess.start()
 	sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
 						path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
-	sess.chat_member = await client.get_chat_member(message.chat.id, "me")
+	try:
+		sess.chat_member = await client.get_chat_member(match["group"], "me")
+	except UserNotParticipant: # Might not be a member of target chat
+		pass
 	await sess.group_call.start(match["group"], invite_hash=match["invite"])
 
 HELP.add_help("leave", "stop radio and leave call",
@@ -100,7 +104,7 @@ HELP.add_help("volume", "set player volume",
 async def volume_cmd(client, message):
 	if len(message.command) < 1:
 		return await edit_or_reply(message, "`[!] → ` No input")
-	if sess.chat_member and not sess.chat_member.can_manage_voice_chats:
+	if not sess.chat_member or not sess.chat_member.can_manage_voice_chats:
 		return await edit_or_reply(message, "`[!] → ` Can't manage voice chat")
 	val = int(message.command[0])
 	await sess.group_call.set_my_volume(val)
