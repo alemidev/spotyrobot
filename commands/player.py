@@ -109,14 +109,3 @@ async def volume_cmd(client, message):
 	val = int(message.command[0])
 	await sess.group_call.set_my_volume(val)
 	await edit_or_reply(message, f"` → ` Volume set to {val}")
-
-HELP.add_help("mute", "toggle player mute", "make bot mute/unmute itself")
-@alemiBot.on_message(is_allowed & filterCommand("mute", list(alemiBot.prefixes)))
-@report_error(logger)
-async def mute_call_cmd(client, message):
-	sess.muted = not sess.muted
-	sess.group_call.set_is_mute(sess.muted)
-	if sess.muted:
-		await edit_or_reply(message, f"` → ` Muted")
-	else:
-		await edit_or_reply(message, f"` → ` Unmuted")
