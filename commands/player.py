@@ -69,7 +69,7 @@ async def join_call_start_radio_cmd(client, message):
 
 voice_chat_invite = filters.create(lambda _, __, msg: msg.web_page.type == "telegram_voicechat")
 
-INVITE_SPLIT = re.compile(r"http(?:s|)://t(?:elegram|).me/(?P<group>.*)\?voicechat=(?P<invite>.*)")
+INVITE_SPLIT = re.compile(r"http(?:s|)://t(?:elegram|).me/(?P<group>.*)\?voicechat(?:=(?P<invite>.*)|)")
 @alemiBot.on_message(filters.private & is_superuser & filters.web_page & voice_chat_invite)
 @report_error(logger)
 async def invited_to_voice_chat_via_link(client, message):
