@@ -113,4 +113,4 @@ async def search_track_cmd(client, message):
 		text += f"`→ ` {format_track(track, preview=preview)}\n` → ` **URI** `{track['uri']}`\n"
 		if i >= limit:
 			break
-	await edit_or_reply(message, f"` → ` {text}")
+	await edit_or_reply(message, text)
