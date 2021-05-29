@@ -110,5 +110,5 @@ async def search_track_cmd(client, message):
 		return await edit_or_reply(message, "`[!] → ` No results")
 	text = ""
 	for track in res["tracks"]["items"]:
-		text += f"`→ ` {format_track(track, preview=preview)}\n` → ` **URI** `{track['uri']}`\n"
+		text += f"` → ` {format_track(track, preview=preview)} | `{track['uri']}`\n"
 	await edit_or_reply(message, text)
