@@ -97,18 +97,18 @@ async def skip_track_cmd(client, message):
 async def search_track_cmd(client, message):
 	"""search a song on spotify
 
-	Search tracks on spotify. Will return first 10 results (change with `-l`).
+	Search tracks on spotify. Will return first 5 results (change with `-l`).
 	Song URIs will be returned, use this before queuing uncommon songs
 	"""
 	if len(message.command) < 1:
 		return await edit_or_reply(message, "`[!] → ` No input")
-	limit = int(message.command["limit"] or 10)
+	limit = int(message.command["limit"] or 5)
 	preview = message.command["-preview"]
 	q = message.command.text
 	res = spotify.search(q, limit=limit)
 	if len(res) < 1:
 		return await edit_or_reply(message, "`[!] → ` No results")
-	text = ""
+	text = f"`→ ` Results for **{q}**\n"
 	for track in res["tracks"]["items"]:
-		text += f"` → ` {format_track(track, preview=preview)} | `{track['uri']}`\n"
+		text += f"` → ` {format_track(track, preview=preview)}\n\t\t`{track['uri']}`\n"
 	await edit_or_reply(message, text)
