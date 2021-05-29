@@ -48,6 +48,8 @@ async def add_to_queue_cmd(client, message):
 		await edit_or_reply(message, "` → ` Added to queue")
 	else:
 		res = spotify.search(q, limit=1)
+		if len(res) < 1:
+			return await edit_or_reply(message, "`[!] → ` No results")
 		spotify.add_to_queue(res["tracks"]["items"][0]["uri"])
 		text = format_track(res["tracks"]["items"][0], preview=preview)
 		await edit_or_reply(message, f"` → ` Added to queue : {text}", disable_web_page_preview=True)
@@ -87,6 +89,8 @@ async def search_track_cmd(client, message):
 	preview = message.command["-preview"]
 	q = message.command.text
 	res = spotify.search(q, limit=1)
+	if len(res) < 1:
+		return await edit_or_reply(message, "`[!] → ` No results")
 	text = format_track(res["tracks"]["items"][0], preview=preview)
 	text += f"\nURI | `{res['tracks']['items'][0]['uri']}`"
 	await edit_or_reply(message, f"` → ` {text}")
