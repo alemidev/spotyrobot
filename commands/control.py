@@ -30,13 +30,17 @@ auth = SpotifyOAuth(username=alemiBot.config.get("spotify", "username", fallback
 spotify = Spotify(auth_manager=auth)
 logger.debug(str(spotify.current_user()))
 
-HELP.add_help("queue", "add song to queue",
-				"add a track to spotify queue. A song URI can be given or a query to search for. " +
-				"Add `-preview` flag to include spotify track url and embedded preview.",
-				args="[-preview] <uri/song>", public=True)
+@HELP.add(cmd="<query>", sudo=False)
 @alemiBot.on_message(is_allowed & filterCommand("queue", list(alemiBot.prefixes), flags=["-preview"]))
 @report_error(logger)
 async def add_to_queue_cmd(client, message):
+	"""add song to queue
+
+	Add a track to spotify queue.
+	Accepts both a search query or a spotify URI.
+	Use `search` command to first lookup songs if you are unsure of your query.
+	Add `-preview` flag to include spotify track url and embedded preview.
+	"""
 	if not sess.group_call or not sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` No active call")
 	if len(message.command) < 1:
@@ -54,12 +58,15 @@ async def add_to_queue_cmd(client, message):
 		text = format_track(res["tracks"]["items"][0], preview=preview)
 		await edit_or_reply(message, f"` → ` Added to queue : {text}", disable_web_page_preview=True)
 
-HELP.add_help("playing", "show current track",
-				"shows track currently being played, a progress bard and a preview. Add flag " +
-				"`-preview` to include spotify track url and embedded preview.", args="[-preview]", public=True)
+@HELP.add_help(sudo=False)
 @alemiBot.on_message(is_allowed & filterCommand("playing", list(alemiBot.prefixes), flags=["-preview"]))
 @report_error(logger)
 async def show_current_song_cmd(client, message):
+	"""show track currently played
+
+	Shows track currently being played, with a progress bar.
+	Add flag `-preview` to include spotify track url and embedded preview.
+	"""
 	if not sess.group_call or not sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` No active call")
 	preview = message.command["-preview"]
@@ -69,28 +76,41 @@ async def show_current_song_cmd(client, message):
 	text = format_track(res["item"], preview=preview) + '\n' + progress_bar(res["progress_ms"], res['item']['duration_ms'])
 	await edit_or_reply(message, f"` → ` {text}")
 
-HELP.add_help("skip", "skip current track", "skip current track", public=True)
+@HELP.add(sudo=False)
 @alemiBot.on_message(is_allowed & filterCommand("skip", list(alemiBot.prefixes)))
 @report_error(logger)
 async def skip_track_cmd(client, message):
+	"""skip current track
+
+	Skip current track. Since playout is buffered (for resampling), skip may take up to 5s.
+	"""
 	if not sess.group_call or not sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` No active call")
 	spotify.next_track()
 	await edit_or_reply(message, "` → ` Skipped")
 
-HELP.add_help(["search"], "search a song on spotify",
-				"will use your query to search a song on spotify and retrieve the URI. Use this to " +
-				"search the song you want before queing if it's not a common one", args="[-preview] <song>", public=True)
-@alemiBot.on_message(is_allowed & filterCommand("search", list(alemiBot.prefixes), flags=["-preview"]))
+@HELP.add(cmd="<query>", sudo=False)
+@alemiBot.on_message(is_allowed & filterCommand("search", list(alemiBot.prefixes), options={
+	"limit" : ["-l", "--limit"],
+}, flags=["-preview"]))
 @report_error(logger)
 async def search_track_cmd(client, message):
+	"""search a song on spotify
+
+	Search tracks on spotify. Will return first 10 results (change with `-l`).
+	Song URIs will be returned, use this before queuing uncommon songs
+	"""
 	if len(message.command) < 1:
 		return await edit_or_reply(message, "`[!] → ` No input")
+	limit = int(message.command["limit"] or 10)
 	preview = message.command["-preview"]
 	q = message.command.text
 	res = spotify.search(q, limit=1)
 	if len(res) < 1:
 		return await edit_or_reply(message, "`[!] → ` No results")
-	text = format_track(res["tracks"]["items"][0], preview=preview)
-	text += f"\nURI | `{res['tracks']['items'][0]['uri']}`"
+	text = ""
+	for i, track in enumerate(res["tracks"]["items"]):
+		text += f"`→ ` {format_track(track, preview=preview)}\n` → ` **URI** `{track['uri']}`\n"
+		if i >= limit:
+			break
 	await edit_or_reply(message, f"` → ` {text}")

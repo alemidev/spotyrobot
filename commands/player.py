@@ -43,18 +43,20 @@ async def invited_to_voice_chat(client, message):
 	except:
 		logger.exception("Error while joining voice chat")
 
-HELP.add_help("join", "join call and start radio",
-				"join voice call and start librespot + ffmpeg. It will show up as " +
-				"a spotify device, you should select it and play music on it. It will " +
-				"be played by the bot. You can specify the device name with `-n` and the " +
-				"device type with `-t`. Available types are : `[ computer, tablet, " +
-				"smartphone, speaker, tv, avr, stb, audiodongle ]`.", args="[-n <name>] [-t <type>] [-debug]")
+@HELP.add()
 @alemiBot.on_message(is_superuser & filterCommand("join", list(alemiBot.prefixes), options={
 	"name" : ["-n", "--name"],
 	"type" : ["-t", "--type"],
 }, flags=["-debug"]))
 @report_error(logger)
 async def join_call_start_radio_cmd(client, message):
+	"""join call and start radio
+
+	Join voice call and start librespot + ffmpeg.
+	It will show up as a spotify device, you should select it and play music on it.
+	Specify the device name with `-n` and device type with `-t`.
+	Available types are : `[ computer, tablet, smartphone, speaker, tv, avr, stb, audiodongle ]`.
+	"""
 	if sess.group_call and sess.group_call.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
 	devicename = message.command["name"] or "SpotyRobot"
@@ -85,23 +87,28 @@ async def invited_to_voice_chat_via_link(client, message):
 		pass
 	await sess.group_call.start(match["group"], invite_hash=match["invite"])
 
-HELP.add_help("leave", "stop radio and leave call",
-				"will first stop playback, then try to terminate both librespot and ffmpeg, " +
-				"and then leave the voice call.")
+@HELP.add()
 @alemiBot.on_message(is_superuser & filterCommand("leave", list(alemiBot.prefixes)))
 @report_error(logger)
 @set_offline
 async def stop_radio_cmd(client, message):
+	"""stop radio and leave call
+
+	Will first stop playback, then try to terminate both librespot and ffmpeg, and then leave the voice call.
+	"""
 	# sess.group_call.stop_playout()
 	await sess.group_call.stop()
 	sess.stop()
 	await edit_or_reply(message, "` → ` Disconnected")
 
-HELP.add_help("volume", "set player volume",
-				"make bot set its own call volume (must have rights to manage voice call)")
-@alemiBot.on_message(is_allowed & filterCommand("volume", list(alemiBot.prefixes)))
+@HELP.add(sudo=False)
+@alemiBot.on_message(is_allowed & filterCommand(["volume", "vol"], list(alemiBot.prefixes)))
 @report_error(logger)
 async def volume_cmd(client, message):
+	"""set player volume
+
+	Make bot set its own call volume (must have rights to manage voice call)
+	"""
 	if len(message.command) < 1:
 		return await edit_or_reply(message, "`[!] → ` No input")
 	if not sess.chat_member or not sess.chat_member.can_manage_voice_chats:
