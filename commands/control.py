@@ -105,12 +105,10 @@ async def search_track_cmd(client, message):
 	limit = int(message.command["limit"] or 10)
 	preview = message.command["-preview"]
 	q = message.command.text
-	res = spotify.search(q, limit=1)
+	res = spotify.search(q, limit=limit)
 	if len(res) < 1:
 		return await edit_or_reply(message, "`[!] → ` No results")
 	text = ""
-	for i, track in enumerate(res["tracks"]["items"]):
+	for track in res["tracks"]["items"]:
 		text += f"`→ ` {format_track(track, preview=preview)}\n` → ` **URI** `{track['uri']}`\n"
-		if i >= limit:
-			break
 	await edit_or_reply(message, text)
