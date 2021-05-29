@@ -58,7 +58,7 @@ async def add_to_queue_cmd(client, message):
 		text = format_track(res["tracks"]["items"][0], preview=preview)
 		await edit_or_reply(message, f"` → ` Added to queue : {text}", disable_web_page_preview=True)
 
-@HELP.add_help(sudo=False)
+@HELP.add(sudo=False)
 @alemiBot.on_message(is_allowed & filterCommand("playing", list(alemiBot.prefixes), flags=["-preview"]))
 @report_error(logger)
 async def show_current_song_cmd(client, message):
