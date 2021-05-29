@@ -108,7 +108,7 @@ async def search_track_cmd(client, message):
 	res = spotify.search(q, limit=limit)
 	if len(res) < 1:
 		return await edit_or_reply(message, "`[!] → ` No results")
-	text = f"`→ ` Results for **{q}**\n"
+	text = f"<code>→ </code> Results for \"<i>{q}</i>\"\n"
 	for track in res["tracks"]["items"]:
-		text += f"` → ` {format_track(track, preview=preview)}\n\t\t\t\t`{track['uri']}`\n"
-	await edit_or_reply(message, text)
+		text += f"<code> → </code> {format_track(track, html=True, preview=preview)}\n\t\t\t\t<code>{track['uri']}</code>\n"
+	await edit_or_reply(message, text, parse_mode="html")
