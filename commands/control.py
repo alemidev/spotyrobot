@@ -7,13 +7,13 @@ from spotipy import SpotifyOAuth, SpotifyStateError, Spotify
 
 from bot import alemiBot
 
-from util.permission import is_allowed, is_superuser
+from util.permission import is_allowed
 from util.message import edit_or_reply
 from util.command import filterCommand
 from util.decorators import report_error
 from util.help import HelpCategory
 
-from plugins.spotyrobot.common import join_artists, format_track, progress_bar
+from plugins.spotyrobot.common import format_track, progress_bar
 from plugins.spotyrobot.session import sess
 
 import logging

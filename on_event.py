@@ -15,6 +15,8 @@ if __name__ == "__main__":
 		envry = dict(os.environ) # never seen this actually
 	elif event == "volume_set":
 		entry = {"event": event, "volume" : int(os.environ["VOLUME"])}
+	elif event == "changed":
+		entry = {"event": event, "from": os.environ["OLD_TRACK_ID"], "to": os.environ["TRACK_ID"]}
 	else:
 		entry = dict(os.environ)
 	
@@ -28,5 +30,5 @@ if __name__ == "__main__":
 	data.append(entry)
 	
 	with open("plugins/spotyrobot/data/events.json", "w") as f:
-		json.dump(data, f)
+		json.dump(data, f, indent=2)
 
