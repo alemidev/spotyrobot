@@ -111,4 +111,4 @@ async def search_track_cmd(client, message):
 	text = f"<code>→ </code> Results for \"<i>{q}</i>\"\n"
 	for track in res["tracks"]["items"]:
 		text += f"<code> → </code> {format_track(track, html=True, preview=preview)}\n\t\t\t\t<code>{track['uri']}</code>\n"
-	await edit_or_reply(message, text, parse_mode="html")
+	await edit_or_reply(message, text, parse_mode="html", disable_web_page_preview=(len(res) > 1))
