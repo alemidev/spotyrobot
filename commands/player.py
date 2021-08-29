@@ -28,20 +28,14 @@ logger = logging.getLogger(__name__)
 HELP = HelpCategory("PLAYER")
 
 @alemiBot.on_message(is_superuser & filters.voice_chat_members_invited)
+@report_error(logger)
 async def invited_to_voice_chat(client, message):
 	invited = [ u.id for u in message.voice_chat_members_invited.users ]
 	if client.me.id not in invited:
 		return
-	if sess.group_call and sess.group_call.is_connected:
+	if sess.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
-	try:
-		sess.start()
-		sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
-							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
-		sess.chat_member = await client.get_chat_member(message.chat.id, "me")
-		await sess.group_call.start(message.chat.id)
-	except:
-		logger.exception("Error while joining voice chat")
+	await sess.start(client, message.chat.id)
 
 @HELP.add()
 @alemiBot.on_message(is_superuser & filterCommand("join", list(alemiBot.prefixes), options={
@@ -57,17 +51,13 @@ async def join_call_start_radio_cmd(client, message):
 	Specify the device name with `-n` and device type with `-t`.
 	Available types are : `[ computer, tablet, smartphone, speaker, tv, avr, stb, audiodongle ]`.
 	"""
-	if sess.group_call and sess.group_call.is_connected:
+	if sess.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
 	devicename = message.command["name"] or "SpotyRobot"
 	devicetype = message.command["type"] or "speaker"
 	quiet = not message.command["-debug"]
-	sess.start(device_name=devicename, device_type=devicetype, quiet=quiet)
-	sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
-							path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
-	sess.chat_member = await client.get_chat_member(message.chat.id, "me")
-	await sess.group_call.start(message.chat.id)
-	await edit_or_reply(message, "` → ` Connected")
+	await edit_or_reply(message, "` → ` Starting player session")
+	await sess.start(client, message.chat.id, device_name=devicename, device_type=devicetype, quiet=quiet)
 
 voice_chat_invite = filters.create(lambda _, __, msg: msg.web_page.type == "telegram_voicechat")
 
@@ -75,17 +65,10 @@ INVITE_SPLIT = re.compile(r"http(?:s|)://t(?:elegram|).me/(?P<group>.*)\?voicech
 @alemiBot.on_message(filters.private & is_superuser & filters.web_page & voice_chat_invite)
 @report_error(logger)
 async def invited_to_voice_chat_via_link(client, message):
-	if sess.group_call and sess.group_call.is_connected:
+	if sess.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
 	match = INVITE_SPLIT.match(message.web_page.url)
-	sess.start()
-	sess.group_call = GroupCall(client, "plugins/spotyrobot/data/music-fifo",
-						path_to_log_file="plugins/spotyrobot/data/tgcalls.log")
-	try:
-		sess.chat_member = await client.get_chat_member(match["group"], "me")
-	except UserNotParticipant: # Might not be a member of target chat
-		pass
-	await sess.group_call.start(match["group"], invite_hash=match["invite"])
+	await sess.start(client, match["group"], invite_hash=match["invite"])
 
 @HELP.add()
 @alemiBot.on_message(is_superuser & filterCommand("leave", list(alemiBot.prefixes)))
@@ -94,12 +77,10 @@ async def invited_to_voice_chat_via_link(client, message):
 async def stop_radio_cmd(client, message):
 	"""stop radio and leave call
 
-	Will first stop playback, then try to terminate both librespot and ffmpeg, and then leave the voice call.
+	Will try to terminate both librespot and ffmpeg, and then leave the voice call.
 	"""
-	# sess.group_call.stop_playout()
-	await sess.group_call.stop()
-	sess.stop()
-	await edit_or_reply(message, "` → ` Disconnected")
+	await edit_or_reply(message, "` → ` Terminating player session")
+	await sess.stop()
 
 @HELP.add(sudo=False)
 @alemiBot.on_message(is_allowed & filterCommand(["volume", "vol"], list(alemiBot.prefixes)))
