@@ -49,9 +49,9 @@ class Session:
 		username = alemiBot.config.get("spotify", "username", fallback=None)
 		password = alemiBot.config.get("spotify", "password", fallback=None)
 		cwd = os.getcwd()
-		if not os.path.isfile("plugins/spotyrobot/data/raw-fifo"):
+		if not os.path.exists("plugins/spotyrobot/data/raw-fifo"):
 			os.mkfifo("plugins/spotyrobot/data/raw-fifo")
-		if not os.path.isfile("plugins/spotyrobot/data/music-fifo"):
+		if not os.path.exists("plugins/spotyrobot/data/music-fifo"):
 			os.mkfifo("plugins/spotyrobot/data/music-fifo")
 		if quiet:
 			self.spoty_log = open("plugins/spotyrobot/data/spoty.log", "w")
