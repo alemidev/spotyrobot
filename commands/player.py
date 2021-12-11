@@ -10,8 +10,6 @@ from pyrogram import filters
 from pyrogram.types import Message
 from pyrogram.errors import UserNotParticipant
 
-from pytgcalls import GroupCall
-
 from bot import alemiBot
 
 from util.permission import is_allowed, is_superuser
