@@ -31,7 +31,7 @@ async def setup_spotify_oauth_api_cb(client:alemiBot):
 	logger.debug(str(SPOTIFY.current_user()))
 
 @HELP.add(cmd="<query>", sudo=False)
-@alemiBot.on_message(is_allowed & filterCommand("queue", list(alemiBot.prefixes), flags=["-preview"]))
+@alemiBot.on_message(is_allowed & filterCommand("queue", flags=["-preview"]))
 @report_error(logger)
 async def add_to_queue_cmd(client:alemiBot, message:Message):
 	"""add song to queue
@@ -59,7 +59,7 @@ async def add_to_queue_cmd(client:alemiBot, message:Message):
 		await edit_or_reply(message, f"` → ` Added to queue : {text}", disable_web_page_preview=True)
 
 @HELP.add(sudo=False)
-@alemiBot.on_message(is_allowed & filterCommand("playing", list(alemiBot.prefixes), flags=["-preview"]))
+@alemiBot.on_message(is_allowed & filterCommand("playing", flags=["-preview"]))
 @report_error(logger)
 async def show_current_song_cmd(client:alemiBot, message:Message):
 	"""show track currently played
@@ -77,7 +77,7 @@ async def show_current_song_cmd(client:alemiBot, message:Message):
 	await edit_or_reply(message, f"` → ` {text}")
 
 @HELP.add(sudo=False)
-@alemiBot.on_message(is_allowed & filterCommand("skip", list(alemiBot.prefixes)))
+@alemiBot.on_message(is_allowed & filterCommand("skip"))
 @report_error(logger)
 async def skip_track_cmd(client:alemiBot, message:Message):
 	"""skip current track
@@ -90,7 +90,7 @@ async def skip_track_cmd(client:alemiBot, message:Message):
 	await edit_or_reply(message, "` → ` Skipped")
 
 @HELP.add(cmd="<query>", sudo=False)
-@alemiBot.on_message(is_allowed & filterCommand("search", list(alemiBot.prefixes), options={
+@alemiBot.on_message(is_allowed & filterCommand("search", options={
 	"limit" : ["-l", "--limit"],
 }, flags=["-preview"]))
 @report_error(logger)

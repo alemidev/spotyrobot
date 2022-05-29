@@ -24,7 +24,7 @@ async def invited_to_voice_chat(client:alemiBot, message:Message):
 	await sess.start(client, message.chat.id)
 
 @HELP.add()
-@alemiBot.on_message(sudo & filterCommand("join", list(alemiBot.prefixes), options={
+@alemiBot.on_message(sudo & filterCommand("join", options={
 	"name" : ["-n", "--name"],
 	"type" : ["-t", "--type"],
 }, flags=["-debug"]))
@@ -57,7 +57,7 @@ async def invited_to_voice_chat_via_link(client:alemiBot, message:Message):
 	await sess.start(client, match["group"], invite_hash=match["invite"])
 
 @HELP.add()
-@alemiBot.on_message(sudo & filterCommand("leave", list(alemiBot.prefixes)))
+@alemiBot.on_message(sudo & filterCommand("leave"))
 @report_error(logger)
 @set_offline
 async def stop_radio_cmd(client:alemiBot, message:Message):
@@ -69,7 +69,7 @@ async def stop_radio_cmd(client:alemiBot, message:Message):
 	await sess.stop()
 
 @HELP.add(sudo=False)
-@alemiBot.on_message(is_allowed & filterCommand(["volume", "vol"], list(alemiBot.prefixes)))
+@alemiBot.on_message(is_allowed & filterCommand(["volume", "vol"]))
 @report_error(logger)
 async def volume_cmd(client:alemiBot, message:Message):
 	"""set player volume
