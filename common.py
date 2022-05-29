@@ -9,7 +9,6 @@ def format_track(track, html=False, preview=False):
 	if preview:
 		return f"**{join_artists(track['artists'])}** - [{track['name']}]({track['external_urls']['spotify']})"
 	return  f"**{join_artists(track['artists'])}** - {track['name']}"
-		
 
 def format_time(ms):
 	return f"{(ms//1000)//60:01}:{(ms//1000)%60:02}"

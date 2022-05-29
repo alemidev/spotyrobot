@@ -3,8 +3,6 @@ import os
 
 from signal import SIGINT
 
-# import ffmpeg
-from pyrogram import Client
 from pyrogram.utils import MAX_CHANNEL_ID
 from pyrogram.errors import UserNotParticipant
 from pyrogram.raw.types import InputGroupCall
@@ -12,7 +10,7 @@ from pyrogram.raw.functions.phone import EditGroupCallTitle
 
 from pytgcalls import GroupCallFactory
 
-from bot import alemiBot
+from alemibot import alemiBot
 
 class Session:
 	def __init__(self):
@@ -39,15 +37,15 @@ class Session:
 
 	async def start(
 			self,
-			client:Client,
+			client:alemiBot,
 			chat_id:int,
 			device_name:str = "SpotyRobot",
 			device_type:str = "speaker",
 			quiet:bool = True,
 			network_updates:bool = True,
 	) -> None:
-		username = alemiBot.config.get("spotify", "username", fallback=None)
-		password = alemiBot.config.get("spotify", "password", fallback=None)
+		username = client.config.get("spotify", "username", fallback="")
+		password = client.config.get("spotify", "password", fallback="")
 		cwd = os.getcwd()
 		if not os.path.exists("plugins/spotyrobot/data/raw-fifo"):
 			os.mkfifo("plugins/spotyrobot/data/raw-fifo")
