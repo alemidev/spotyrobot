@@ -39,7 +39,7 @@ async def join_call_start_radio_cmd(client:alemiBot, message:Message):
 	"""
 	if sess.is_connected:
 		return await edit_or_reply(message, "`[!] → ` Already in another call")
-	devicename = message.command["name"] or alemiBot.config.get("customization", "playerName", fallback="SpotyRobot")
+	devicename = message.command["name"] or client.config.get("customization", "playerName", fallback="SpotyRobot")
 	devicetype = message.command["type"] or "castaudio"
 	quiet = not message.command["-debug"]
 	await edit_or_reply(message, "` → ` Starting player session")
